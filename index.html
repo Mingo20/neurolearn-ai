@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="theme-color" content="#0A0A0A">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NeuroLearn AI">
+<meta name="description" content="Aprende Inteligencia Artificial desde cero hasta Agentes. Tu profesor es la propia IA.">
+<title>NeuroLearn AI</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0A0A0A;--bg2:#111827;--bg3:#1F2937;--bg4:#374151;
+  --blue:#4285F4;--blue2:#1A73E8;--cyan:#06B6D4;--green:#10B981;
+  --orange:#F59E0B;--red:#EF4444;--purple:#8B5CF6;
+  --on:#F9FAFB;--on2:#D1D5DB;--on3:#9CA3AF;--on4:#4B5563;
+  --border:#1F2937;--border2:#374151;
+  --r:12px;--r2:18px;--r3:24px;
+  --glow-blue:0 0 30px rgba(66,133,244,.2);
+  --trans:.25s cubic-bezier(.4,0,.2,1);
+}
+html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:var(--on);overflow:hidden}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* APP SHELL */
+#app{display:flex;height:100dvh;position:relative;overflow:hidden}
+
+/* SIDEBAR */
+#sidebar{width:256px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;transition:width var(--trans);z-index:100;overflow:hidden}
+#sidebar.collapsed{width:64px}
+.sb-head{padding:14px 12px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);min-height:60px}
+.logo-ico{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--cyan));display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:var(--glow-blue)}
+.logo-ico svg{width:20px;height:20px;color:#fff}
+.logo-txt{font-size:16px;font-weight:800;white-space:nowrap;transition:opacity var(--trans)}
+.logo-txt em{color:var(--blue);font-style:normal}
+#sidebar.collapsed .logo-txt,.sb-label,#sidebar.collapsed .nav-txt,#sidebar.collapsed .sb-badge,#sidebar.collapsed .usr-info{opacity:0;width:0;overflow:hidden}
+.sb-toggle{margin-left:auto;width:30px;height:30px;border-radius:8px;border:none;background:none;color:var(--on3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.sb-toggle:hover{background:var(--bg3);color:var(--on)}
+.sb-nav{flex:1;overflow-y:auto;padding:8px 6px}
+.sb-label{font-size:10px;font-weight:600;color:var(--on4);text-transform:uppercase;letter-spacing:.8px;padding:10px 8px 4px;white-space:nowrap;transition:opacity var(--trans)}
+.nav-btn{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r);cursor:pointer;transition:all .2s;border:none;background:none;width:100%;text-align:left;color:var(--on3);margin-bottom:1px;white-space:nowrap}
+.nav-btn:hover{background:var(--bg3);color:var(--on)}
+.nav-btn.active{background:rgba(66,133,244,.12);color:var(--blue)}
+.nav-btn svg{width:18px;height:18px;flex-shrink:0}
+.nav-txt{font-size:13px;font-weight:500;transition:opacity var(--trans)}
+.sb-badge{margin-left:auto;padding:1px 6px;background:var(--blue);color:#fff;font-size:10px;font-weight:700;border-radius:20px;flex-shrink:0;transition:opacity var(--trans)}
+.lock-ico{margin-left:auto;flex-shrink:0;opacity:.5}
+.sb-foot{padding:10px 6px;border-top:1px solid var(--border)}
+.usr-card{display:flex;align-items:center;gap:10px;padding:8px;border-radius:var(--r);cursor:pointer;transition:all .2s}
+.usr-card:hover{background:var(--bg3)}
+.usr-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
+.usr-info{overflow:hidden;flex:1;transition:opacity var(--trans)}
+.usr-name{font-size:12px;font-weight:600;white-space:nowrap}
+.usr-lvl{font-size:10px;color:var(--blue)}
+
+/* MAIN */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+
+/* TOPBAR */
+#topbar{height:60px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0}
+.topbar-ttl{font-size:16px;font-weight:700;flex:1}
+.topbar-ttl span{color:var(--blue)}
+.tb-btn{width:36px;height:36px;border-radius:50%;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--on3);transition:all .2s}
+.tb-btn:hover{background:var(--bg3);color:var(--on)}
+.tb-btn svg{width:18px;height:18px}
+.mob-menu{display:none}
+.xp-pill{display:flex;align-items:center;gap:6px;padding:5px 11px;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;font-size:11px;font-weight:600}
+.xp-dot{width:6px;height:6px;border-radius:50%;background:var(--orange);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+
+/* CONTENT */
+#content{flex:1;overflow-y:auto;position:relative}
+.page{display:none;animation:fadeUp .3s ease}
+.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.page-lesson{display:none;flex-direction:column;height:100%}
+.page-lesson.active{display:flex}
+
+/* INSTALL BANNER */
+.inst-bar{display:none;align-items:center;gap:10px;padding:9px 16px;background:rgba(66,133,244,.07);border-bottom:1px solid rgba(66,133,244,.15);cursor:pointer;flex-shrink:0}
+.inst-bar.show{display:flex}
+.inst-bar:hover{background:rgba(66,133,244,.12)}
+.inst-txt{flex:1}
+.inst-txt b{display:block;font-size:12px;color:var(--on)}
+.inst-txt small{font-size:11px;color:var(--on3)}
+.inst-cta{padding:5px 14px;background:var(--blue);color:#fff;border:none;border-radius:16px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap}
+.inst-x{background:none;border:none;color:var(--on4);cursor:pointer;font-size:16px;padding:4px}
+
+/* HOME */
+.hero{background:linear-gradient(160deg,#0A0A0A 0%,#0D1B2E 60%,#0A0A0A 100%);padding:48px 32px 40px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(66,133,244,.1) 0%,transparent 70%);pointer-events:none}
+.hero-in{max-width:760px;margin:0 auto;position:relative;z-index:1;text-align:center}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;background:rgba(66,133,244,.08);border:1px solid rgba(66,133,244,.2);border-radius:20px;font-size:11px;font-weight:600;color:var(--blue);margin-bottom:20px}
+.pulse-dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);animation:pulse 2s infinite}
+.hero-h1{font-size:clamp(26px,5vw,50px);font-weight:900;line-height:1.1;margin-bottom:14px}
+.hl{background:linear-gradient(90deg,var(--blue),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-p{font-size:clamp(13px,2vw,16px);color:var(--on2);line-height:1.7;max-width:520px;margin:0 auto 28px}
+.hero-acts{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.btn-p{padding:11px 24px;background:var(--blue);color:#fff;border:none;border-radius:var(--r2);font-size:13px;font-weight:700;cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:7px}
+.btn-p:hover{background:var(--blue2);transform:translateY(-1px);box-shadow:var(--glow-blue)}
+.btn-o{padding:11px 24px;background:none;color:var(--on);border:1px solid var(--border2);border-radius:var(--r2);font-size:13px;font-weight:600;cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:7px}
+.btn-o:hover{border-color:var(--blue);color:var(--blue)}
+
+.stats{display:flex;gap:12px;padding:24px 32px;flex-wrap:wrap;justify-content:center}
+.stat{flex:1;min-width:120px;max-width:180px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:18px;text-align:center;transition:all .25s;cursor:default}
+.stat:hover{border-color:var(--blue);transform:translateY(-2px)}
+.stat-ico{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin:0 auto 8px}
+.stat-ico svg{width:22px;height:22px}
+.stat-n{font-size:24px;font-weight:800}
+.stat-l{font-size:11px;color:var(--on3);margin-top:2px}
+
+.sec-head{padding:0 32px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.sec-head h2{font-size:17px;font-weight:700}
+.see-all{font-size:12px;color:var(--blue);background:none;border:none;cursor:pointer;font-weight:600}
+.see-all:hover{text-decoration:underline}
+.mods-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;padding:0 32px 32px}
+
+/* MODULE CARD */
+.mod-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;cursor:pointer;transition:all .28s;position:relative}
+.mod-card:hover:not(.locked){border-color:var(--blue);transform:translateY(-2px);box-shadow:0 8px 30px rgba(66,133,244,.12)}
+.mod-card.locked{opacity:.55;cursor:not-allowed}
+.mod-top{padding:18px 18px 14px;display:flex;align-items:flex-start;gap:12px}
+.mod-ico{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mod-ico svg{width:24px;height:24px}
+.mod-meta{flex:1}
+.mod-num{font-size:10px;font-weight:600;color:var(--on3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.mod-title{font-size:14px;font-weight:700;line-height:1.3}
+.mod-desc{font-size:12px;color:var(--on2);margin-top:3px;line-height:1.5}
+.mod-bot{padding:10px 18px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.mod-cnt{font-size:11px;color:var(--on3);display:flex;align-items:center;gap:4px}
+.mod-cnt svg{width:13px;height:13px}
+.prog-wrap{display:flex;align-items:center;gap:7px}
+.prog-bar{width:70px;height:3px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--cyan));border-radius:2px;transition:width .5s}
+.prog-pct{font-size:10px;color:var(--on3)}
+.mod-tag{position:absolute;top:10px;right:10px;padding:2px 8px;border-radius:20px;font-size:9px;font-weight:700}
+.tag-new{background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.25)}
+.tag-lock{background:rgba(255,255,255,.05);color:var(--on3);border:1px solid var(--border2)}
+
+/* LESSON LAYOUT */
+.lesson-bar{padding:10px 16px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.back-btn{width:34px;height:34px;border-radius:50%;border:none;background:none;cursor:pointer;color:var(--on2);display:flex;align-items:center;justify-content:center;transition:all .2s}
+.back-btn:hover{background:var(--bg3);color:var(--on)}
+.back-btn svg{width:18px;height:18px}
+.lesson-bc{flex:1}
+.lesson-bc-top{font-size:10px;color:var(--on3)}
+.lesson-bc-bot{font-size:13px;font-weight:700}
+.ai-live{display:flex;align-items:center;gap:5px;padding:5px 11px;background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.18);border-radius:16px;font-size:11px;font-weight:600;color:var(--green)}
+.ai-live span{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+
+.lesson-body{flex:1;display:grid;overflow:hidden}
+.content-pane{overflow-y:auto;padding:24px}
+.chat-pane{display:flex;flex-direction:column;background:var(--bg2);border-left:1px solid var(--border)}
+
+/* LESSON CONTENT */
+.l-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:16px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
+.l-h1{font-size:clamp(18px,3vw,26px);font-weight:800;line-height:1.2;margin-bottom:10px}
+.l-intro{font-size:14px;color:var(--on2);line-height:1.7;margin-bottom:20px}
+.concept{background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--blue);border-radius:0 var(--r) var(--r) 0;padding:14px 16px;margin-bottom:14px}
+.concept h4{font-size:11px;font-weight:700;color:var(--blue);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
+.concept p{font-size:13px;color:var(--on2);line-height:1.6}
+.code-box{background:#0D1117;border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:14px;overflow-x:auto}
+.code-box pre{font-family:'Courier New',monospace;font-size:12px;line-height:1.6;color:#E6EDF3}
+.kw{color:#FF7B72}.str{color:#A5D6FF}.cm{color:#8B949E}.fn{color:#D2A8FF}
+.quiz{background:rgba(66,133,244,.05);border:1px solid rgba(66,133,244,.15);border-radius:var(--r2);padding:18px;margin-bottom:14px}
+.quiz h4{font-size:13px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.q-opt{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;margin-bottom:7px;cursor:pointer;transition:all .2s;font-size:13px}
+.q-opt:hover{border-color:var(--blue)}
+.q-opt.ok{border-color:var(--green);background:rgba(16,185,129,.07);color:var(--green)}
+.q-opt.no{border-color:var(--red);background:rgba(239,68,68,.07);color:var(--red)}
+.l-nav{display:flex;gap:10px;padding:20px 0;flex-wrap:wrap}
+
+/* CHAT PANE */
+.chat-hd{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px;flex-shrink:0}
+.chat-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--cyan));display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:var(--glow-blue)}
+.chat-av svg{width:18px;height:18px;color:#fff}
+.chat-name{font-size:12px;font-weight:700}
+.chat-stat{font-size:10px;color:var(--green);display:flex;align-items:center;gap:3px}
+.chat-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.msg{display:flex;flex-direction:column;max-width:90%;gap:3px;animation:fadeUp .2s ease}
+.msg.ai{align-self:flex-start;align-items:flex-start}
+.msg.usr{align-self:flex-end;align-items:flex-end}
+.bubble{padding:9px 13px;border-radius:16px;font-size:13px;line-height:1.6;word-break:break-word}
+.msg.ai .bubble{background:var(--bg3);border:1px solid var(--border);border-radius:16px 16px 16px 3px}
+.msg.usr .bubble{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;border-radius:16px 16px 3px 16px}
+.msg-t{font-size:9px;color:var(--on4);padding:0 3px}
+.typing{background:var(--bg3);border:1px solid var(--border);padding:9px 13px;border-radius:16px 16px 16px 3px;display:flex;gap:3px;align-items:center;width:fit-content}
+.typing span{width:6px;height:6px;border-radius:50%;background:var(--on3);animation:td .9s ease infinite}
+.typing span:nth-child(2){animation-delay:.15s}
+.typing span:nth-child(3){animation-delay:.3s}
+@keyframes td{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+.chips{display:flex;gap:6px;padding:8px 12px;overflow-x:auto;border-top:1px solid var(--border);flex-shrink:0}
+.chips::-webkit-scrollbar{display:none}
+.chip{padding:5px 11px;background:var(--bg3);border:1px solid var(--border);border-radius:14px;font-size:11px;font-weight:600;color:var(--on2);white-space:nowrap;cursor:pointer;flex-shrink:0;transition:all .2s}
+.chip:hover{border-color:var(--blue);color:var(--blue)}
+.chat-inp-row{padding:9px 10px;border-top:1px solid var(--border);display:flex;align-items:flex-end;gap:7px;flex-shrink:0}
+.chat-ta{flex:1;padding:8px 11px;background:var(--bg3);border:1px solid var(--border);border-radius:18px;color:var(--on);font-size:13px;font-family:inherit;resize:none;outline:none;max-height:90px;line-height:1.5;transition:border .2s}
+.chat-ta:focus{border-color:var(--blue)}
+.chat-ta::placeholder{color:var(--on4)}
+.send-btn{width:36px;height:36px;border-radius:50%;background:var(--blue);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.send-btn:hover{background:var(--blue2);transform:scale(1.05)}
+.send-btn svg{width:16px;height:16px;color:#fff}
+
+/* PROGRESS PAGE */
+.prog-page{padding:28px;max-width:860px}
+.xp-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:22px;margin-bottom:22px;display:flex;align-items:center;gap:18px}
+.xp-ring-wrap{width:76px;height:76px;flex-shrink:0;position:relative;display:flex;align-items:center;justify-content:center}
+.xp-ring-wrap svg{position:absolute;width:76px;height:76px;transform:rotate(-90deg)}
+.xp-ring-wrap circle{fill:none;stroke-width:5;stroke-linecap:round}
+.xp-bg{stroke:var(--bg4)}
+.xp-fg{stroke:url(#xpg);stroke-dasharray:210;stroke-dashoffset:80;transition:stroke-dashoffset 1s}
+.xp-lv{font-size:20px;font-weight:800;position:relative;z-index:1}
+.xp-info h3{font-size:17px;font-weight:700}
+.xp-info p{font-size:12px;color:var(--on2);margin-top:3px}
+.xp-bar-row{display:flex;align-items:center;gap:8px;margin-top:10px}
+.xp-bar{flex:1;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.xp-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--cyan));border-radius:3px}
+.xp-pts{font-size:11px;color:var(--on3)}
+.ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:22px}
+.ach{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px;display:flex;align-items:center;gap:11px;transition:all .2s}
+.ach.unlocked{border-color:var(--orange)}
+.ach:hover{transform:translateY(-1px)}
+.ach-ico{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.ach-name{font-size:12px;font-weight:700}
+.ach-desc{font-size:10px;color:var(--on3);margin-top:1px}
+.locked-ach{opacity:.35}
+
+/* LAB PAGE */
+.lab-page{padding:28px;max-width:860px}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);z-index:500;display:none;align-items:flex-end;justify-content:center}
+.overlay.open{display:flex;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{background:var(--bg2);border:1px solid var(--border);width:100%;max-width:600px;max-height:88vh;overflow-y:auto;animation:slideUp .35s cubic-bezier(.34,1.56,.64,1)}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@media(min-width:640px){
+  .overlay{align-items:center}
+  .modal{border-radius:var(--r2);max-height:80vh;animation:zoomIn .3s cubic-bezier(.34,1.4,.64,1)}
+  @keyframes zoomIn{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}
+}
+@media(max-width:639px){.modal{border-radius:var(--r2) var(--r2) 0 0}}
+.modal-handle{width:36px;height:3px;background:var(--border2);border-radius:2px;margin:10px auto 0}
+.modal-hd{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:11px}
+.modal-hd-ico{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.modal-hd-ico svg{width:22px;height:22px}
+.modal-ttl{font-size:16px;font-weight:800;flex:1}
+.modal-x{width:30px;height:30px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--on3);transition:all .2s}
+.modal-x:hover{background:var(--bg4);color:var(--on)}
+.modal-x svg{width:14px;height:14px}
+.modal-bd{padding:18px}
+.modal-ft{padding:14px 18px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+
+/* BOTTOM NAV MOBILE */
+.bot-nav{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--border);display:none;z-index:200;padding-bottom:env(safe-area-inset-bottom)}
+.bn-row{display:flex;justify-content:space-around;padding:6px 0}
+.bn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 14px;border:none;background:none;cursor:pointer;color:var(--on4);transition:all .2s;flex:1}
+.bn.active{color:var(--blue)}
+.bn svg{width:22px;height:22px}
+.bn span{font-size:9px;font-weight:600}
+.bn-fab{position:relative;margin-top:-22px}
+.fab-ico{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--cyan));display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(66,133,244,.4)}
+.fab-ico svg{width:22px;height:22px;color:#fff}
+
+/* DRAWER */
+.drawer-ov{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;display:none}
+.drawer-ov.open{display:block}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:272px;background:var(--bg2);border-right:1px solid var(--border);z-index:400;transform:translateX(-100%);transition:transform .3s ease;overflow-y:auto}
+.drawer.open{transform:translateX(0)}
+
+/* TOAST */
+.toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%) translateY(16px);background:rgba(17,24,39,.96);color:#fff;padding:9px 18px;border-radius:22px;font-size:12px;font-weight:600;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;border:1px solid rgba(255,255,255,.06);backdrop-filter:blur(8px)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  #sidebar{display:none}
+  .mob-menu{display:flex}
+  .bot-nav{display:block}
+  #content{padding-bottom:68px}
+  .hero{padding:28px 16px 32px}
+  .stats{padding:16px}
+  .mods-grid{padding:0 16px 80px;grid-template-columns:1fr}
+  .sec-head{padding:0 16px}
+  .prog-page{padding:16px;padding-bottom:80px}
+  .lab-page{padding:16px;padding-bottom:80px}
+  .lesson-body{grid-template-columns:1fr!important;grid-template-rows:auto 1fr!important}
+  .content-pane{border-right:none!important;border-bottom:1px solid var(--border);max-height:44vh}
+  .content-pane{padding:16px}
+  .chat-pane{min-height:300px}
+}
+@media(min-width:769px){
+  .lesson-body{grid-template-columns:1fr 360px}
+  .content-pane{border-right:1px solid var(--border)}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="xpg" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4285F4"/>
+      <stop offset="100%" stop-color="#06B6D4"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<div id="app">
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="sb-head">
+    <div class="logo-ico">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+    </div>
+    <span class="logo-txt">Neuro<em>Learn</em></span>
+    <button class="sb-toggle" onclick="toggleSB()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+    </button>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-label">Principal</div>
+    <button class="nav-btn active" onclick="goPage('home')" id="nb-home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span class="nav-txt">Inicio</span>
+    </button>
+    <button class="nav-btn" onclick="goPage('progress')" id="nb-progress">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span class="nav-txt">Mi Progreso</span>
+      <span class="sb-badge">Lv3</span>
+    </button>
+    <button class="nav-btn" onclick="goPage('lab')" id="nb-lab">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
+      <span class="nav-txt">Laboratorio IA</span>
+    </button>
+    <div class="sb-label" style="margin-top:8px">Módulos</div>
+    <button class="nav-btn" onclick="abrirModulo(0)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span class="nav-txt">1. Fundamentos IA</span>
+    </button>
+    <button class="nav-btn" onclick="abrirModulo(1)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span class="nav-txt">2. Machine Learning</span>
+    </button>
+    <button class="nav-btn" style="opacity:.45;cursor:not-allowed">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <span class="nav-txt">3. Deep Learning</span>
+      <svg class="lock-ico" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    </button>
+    <button class="nav-btn" style="opacity:.45;cursor:not-allowed">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span class="nav-txt">4. NLP & LLMs</span>
+      <svg class="lock-ico" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    </button>
+    <button class="nav-btn" style="opacity:.45;cursor:not-allowed">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+      <span class="nav-txt">5. Agentes IA</span>
+      <svg class="lock-ico" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    </button>
+  </div>
+  <div class="sb-foot">
+    <div class="usr-card" onclick="abrirModal('m-perfil')">
+      <div class="usr-av">D</div>
+      <div class="usr-info">
+        <div class="usr-name">Estudiante</div>
+        <div class="usr-lvl">Nivel 3 · 1,240 XP</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div id="main">
+
+  <!-- INSTALL BANNER -->
+  <div class="inst-bar" id="inst-bar" onclick="instalarPWA()">
+    <div class="logo-ico" style="width:28px;height:28px;border-radius:7px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" width="16" height="16"><path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+    </div>
+    <div class="inst-txt"><b>Instalar NeuroLearn AI</b><small>Descárgala como app nativa</small></div>
+    <button class="inst-cta">Instalar</button>
+    <button class="inst-x" onclick="event.stopPropagation();document.getElementById('inst-bar').classList.remove('show')">✕</button>
+  </div>
+
+  <!-- TOPBAR -->
+  <div id="topbar">
+    <button class="tb-btn mob-menu" onclick="abrirDrawer()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+    </button>
+    <div class="topbar-ttl" id="ttl">Inicio <span></span></div>
+    <div class="xp-pill"><span class="xp-dot"></span>1,240 XP</div>
+    <button class="tb-btn" onclick="abrirModal('m-perfil')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    </button>
+  </div>
+
+  <!-- CONTENT -->
+  <div id="content">
+
+    <!-- HOME -->
+    <div class="page active" id="page-home">
+      <div class="hero">
+        <div class="hero-in">
+          <div class="hero-badge"><span class="pulse-dot"></span>Impulsado por IA en tiempo real · 2026</div>
+          <h1 class="hero-h1">Aprende <span class="hl">Inteligencia Artificial</span><br>con la propia IA como profesor</h1>
+          <p class="hero-p">Desde cero absoluto hasta construir tus propios Agentes autónomos. Tu profesor IA adapta cada lección a tu nivel — nunca se repite, siempre evoluciona.</p>
+          <div class="hero-acts">
+            <button class="btn-p" onclick="abrirModulo(0)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              Comenzar ahora
+            </button>
+            <button class="btn-o" onclick="abrirModal('m-tour')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              ¿Cómo funciona?
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><div class="stat-ico" style="background:rgba(66,133,244,.1)"><svg viewBox="0 0 24 24" fill="none" stroke="#4285F4" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div><div class="stat-n">5</div><div class="stat-l">Módulos</div></div>
+        <div class="stat"><div class="stat-ico" style="background:rgba(6,182,212,.1)"><svg viewBox="0 0 24 24" fill="none" stroke="#06B6D4" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><div class="stat-n">∞</div><div class="stat-l">Lecciones IA</div></div>
+        <div class="stat"><div class="stat-ico" style="background:rgba(16,185,129,.1)"><svg viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="stat-n">24/7</div><div class="stat-l">Profesor IA</div></div>
+        <div class="stat"><div class="stat-ico" style="background:rgba(245,158,11,.1)"><svg viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div class="stat-n">XP</div><div class="stat-l">Logros</div></div>
+      </div>
+
+      <div class="sec-head"><h2>Ruta de Aprendizaje</h2><button class="see-all" onclick="goPage('progress')">Ver progreso →</button></div>
+      <div class="mods-grid" id="mods-grid"></div>
+    </div>
+
+    <!-- PROGRESS -->
+    <div class="page" id="page-progress">
+      <div class="prog-page">
+        <h2 style="font-size:20px;font-weight:800;margin-bottom:18px">Mi Progreso</h2>
+        <div class="xp-card">
+          <div class="xp-ring-wrap">
+            <svg><circle class="xp-bg" cx="38" cy="38" r="33"/><circle class="xp-fg" cx="38" cy="38" r="33" id="xp-fg"/></svg>
+            <div class="xp-lv">3</div>
+          </div>
+          <div class="xp-info" style="flex:1">
+            <h3>Nivel 3 — Explorador de IA</h3>
+            <p>Estás construyendo una base sólida. ¡Sigue así!</p>
+            <div class="xp-bar-row">
+              <div class="xp-bar"><div class="xp-fill" style="width:62%"></div></div>
+              <span class="xp-pts">1,240 / 2,000 XP</span>
+            </div>
+          </div>
+        </div>
+        <h3 style="font-size:15px;font-weight:700;margin-bottom:10px">Logros</h3>
+        <div class="ach-grid">
+          <div class="ach unlocked"><div class="ach-ico" style="background:rgba(245,158,11,.1)">🌟</div><div><div class="ach-name">Primera Lección</div><div class="ach-desc">Completaste tu primera clase</div></div></div>
+          <div class="ach unlocked"><div class="ach-ico" style="background:rgba(66,133,244,.1)">🧠</div><div><div class="ach-name">Mente Curiosa</div><div class="ach-desc">10 preguntas al profesor IA</div></div></div>
+          <div class="ach unlocked"><div class="ach-ico" style="background:rgba(16,185,129,.1)">💻</div><div><div class="ach-name">Primer Código</div><div class="ach-desc">Ejecutaste tu primer algoritmo</div></div></div>
+          <div class="ach locked-ach"><div class="ach-ico" style="background:var(--bg4)">🤖</div><div><div class="ach-name">Constructor de Agentes</div><div class="ach-desc">Crea tu primer agente IA</div></div></div>
+          <div class="ach locked-ach"><div class="ach-ico" style="background:var(--bg4)">🚀</div><div><div class="ach-name">Loop Master</div><div class="ach-desc">Completa módulo de Agentes</div></div></div>
+          <div class="ach locked-ach"><div class="ach-ico" style="background:var(--bg4)">🏆</div><div><div class="ach-name">IA Graduate</div><div class="ach-desc">Completa todos los módulos</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LAB -->
+    <div class="page" id="page-lab">
+      <div class="lab-page">
+        <h2 style="font-size:20px;font-weight:800;margin-bottom:6px">Laboratorio de IA</h2>
+        <p style="color:var(--on2);margin-bottom:24px;font-size:13px">Experimenta con modelos reales. Tu profesor IA te guía en cada experimento.</p>
+        <div class="mods-grid" style="padding:0 0 32px">
+          <div class="mod-card" onclick="abrirModulo(0)">
+            <div class="mod-top"><div class="mod-ico" style="background:rgba(66,133,244,.1)"><svg viewBox="0 0 24 24" fill="none" stroke="#4285F4" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="mod-meta"><div class="mod-num">Experimento 01</div><div class="mod-title">Ingeniería de Prompts</div><div class="mod-desc">Aprende a comunicarte con LLMs de forma efectiva</div></div></div>
+            <div class="mod-bot"><span style="font-size:11px;color:var(--green);background:rgba(16,185,129,.1);padding:3px 9px;border-radius:12px;font-weight:600">Disponible</span></div>
+          </div>
+          <div class="mod-card" onclick="toast('🔒 Completa Módulo 4 para acceder al Lab de Agentes')">
+            <div class="mod-top"><div class="mod-ico" style="background:rgba(6,182,212,.1)"><svg viewBox="0 0 24 24" fill="none" stroke="#06B6D4" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg></div><div class="mod-meta"><div class="mod-num">Experimento 02</div><div class="mod-title">Constructor de Agentes</div><div class="mod-desc">Diseña y prueba tu primer agente autónomo</div></div></div>
+            <div class="mod-bot"><span style="font-size:11px;color:var(--on3);background:var(--bg4);padding:3px 9px;border-radius:12px;font-weight:600">🔒 Bloqueado</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LESSON (flex) -->
+    <div class="page page-lesson" id="page-lesson">
+      <div class="lesson-bar">
+        <button class="back-btn" onclick="goPage('home')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="lesson-bc">
+          <div class="lesson-bc-top" id="bc-top">Módulo 1</div>
+          <div class="lesson-bc-bot" id="bc-bot">Cargando...</div>
+        </div>
+        <div class="ai-live"><span></span>IA activa</div>
+      </div>
+      <div class="lesson-body">
+        <div class="content-pane" id="lesson-content"></div>
+        <div class="chat-pane">
+          <div class="chat-hd">
+            <div class="chat-av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></div>
+            <div>
+              <div class="chat-name">Profesor NeuroLearn IA</div>
+              <div class="chat-stat"><span style="width:5px;height:5px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse 2s infinite"></span>Respondiendo en tiempo real</div>
+            </div>
+          </div>
+          <div class="chat-msgs" id="chat-msgs"></div>
+          <div class="chips" id="chips"></div>
+          <div class="chat-inp-row">
+            <textarea class="chat-ta" id="chat-inp" rows="1" placeholder="Pregúntale al Profesor IA..." oninput="autoGrow(this)" onkeydown="chatKey(event)"></textarea>
+            <button class="send-btn" onclick="enviarChat()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- BOTTOM NAV (mobile) -->
+<div class="bot-nav">
+  <div class="bn-row">
+    <button class="bn active" onclick="goPage('home');activeBN('bn-h')" id="bn-h">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+      <span>Inicio</span>
+    </button>
+    <button class="bn" onclick="goPage('progress');activeBN('bn-p')" id="bn-p">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span>Progreso</span>
+    </button>
+    <button class="bn bn-fab" onclick="abrirModulo(0);activeBN('bn-l')" id="bn-l">
+      <div class="fab-ico"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+      <span>Aprender</span>
+    </button>
+    <button class="bn" onclick="goPage('lab');activeBN('bn-lb')" id="bn-lb">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18"/></svg>
+      <span>Lab</span>
+    </button>
+    <button class="bn" onclick="abrirModal('m-perfil')" id="bn-pr">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>Perfil</span>
+    </button>
+  </div>
+</div>
+
+<!-- DRAWER MOBILE -->
+<div class="drawer-ov" id="dov" onclick="cerrarDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="sb-head" style="padding:14px">
+    <div class="logo-ico"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></div>
+    <span style="font-size:16px;font-weight:800">Neuro<em style="color:var(--blue);font-style:normal">Learn</em></span>
+    <button onclick="cerrarDrawer()" style="margin-left:auto;background:none;border:none;color:var(--on2);cursor:pointer;font-size:20px">✕</button>
+  </div>
+  <div style="padding:8px 6px">
+    <button class="nav-btn" onclick="goPage('home');cerrarDrawer()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span class="nav-txt">Inicio</span></button>
+    <button class="nav-btn" onclick="goPage('progress');cerrarDrawer()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span class="nav-txt">Mi Progreso</span></button>
+    <button class="nav-btn" onclick="goPage('lab');cerrarDrawer()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18"/></svg><span class="nav-txt">Laboratorio IA</span></button>
+    <div style="height:1px;background:var(--border);margin:8px 0"></div>
+    <div style="padding:8px 10px;font-size:10px;color:var(--on4);text-transform:uppercase;letter-spacing:.8px;font-weight:600">Módulos</div>
+    <button class="nav-btn" onclick="abrirModulo(0);cerrarDrawer()"><span class="nav-txt">1. Fundamentos de IA</span></button>
+    <button class="nav-btn" onclick="abrirModulo(1);cerrarDrawer()"><span class="nav-txt">2. Machine Learning</span></button>
+    <button class="nav-btn" style="opacity:.4;cursor:not-allowed"><span class="nav-txt">3. Deep Learning 🔒</span></button>
+    <button class="nav-btn" style="opacity:.4;cursor:not-allowed"><span class="nav-txt">4. NLP & LLMs 🔒</span></button>
+    <button class="nav-btn" style="opacity:.4;cursor:not-allowed"><span class="nav-txt">5. Agentes IA 🔒</span></button>
+  </div>
+</div>
+
+<!-- MODALES -->
+<!-- Perfil -->
+<div class="overlay" id="m-perfil" onclick="if(event.target===this)cerrarModal('m-perfil')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-hd">
+      <div class="modal-hd-ico" style="background:rgba(66,133,244,.1)"><svg viewBox="0 0 24 24" fill="none" stroke="#4285F4" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+      <div class="modal-ttl">Mi Perfil</div>
+      <button class="modal-x" onclick="cerrarModal('m-perfil')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-bd">
+      <div style="text-align:center;padding:16px 0">
+        <div class="usr-av" style="width:68px;height:68px;font-size:26px;margin:0 auto 10px">D</div>
+        <div style="font-size:17px;font-weight:700">Estudiante NeuroLearn</div>
+        <div style="color:var(--blue);font-size:12px;margin-top:3px">Nivel 3 — Explorador de IA</div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:14px;margin-top:10px;display:flex;justify-content:space-around;text-align:center">
+        <div><div style="font-size:20px;font-weight:800">1,240</div><div style="font-size:10px;color:var(--on3)">XP Total</div></div>
+        <div><div style="font-size:20px;font-weight:800">3</div><div style="font-size:10px;color:var(--on3)">Logros</div></div>
+        <div><div style="font-size:20px;font-weight:800">2</div><div style="font-size:10px;color:var(--on3)">Módulos</div></div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn-o" onclick="cerrarModal('m-perfil')" style="padding:9px 18px">Cerrar</button>
+      <button class="btn-p" onclick="goPage('progress');cerrarModal('m-perfil')" style="padding:9px 18px">Ver progreso</button>
+    </div>
+  </div>
+</div>
+
+<!-- Tour -->
+<div class="overlay" id="m-tour" onclick="if(event.target===this)cerrarModal('m-tour')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-hd">
+      <div class="modal-hd-ico" style="background:rgba(66,133,244,.1)"><svg viewBox="0 0 24 24" fill="none" stroke="#4285F4" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+      <div class="modal-ttl">¿Cómo funciona?</div>
+      <button class="modal-x" onclick="cerrarModal('m-tour')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-bd" style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:40px;height:40px;border-radius:11px;background:rgba(66,133,244,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px">🤖</div><div><div style="font-weight:700;margin-bottom:3px">La IA es tu profesor personal</div><div style="font-size:13px;color:var(--on2)">Cada lección se genera en tiempo real. El contenido evoluciona contigo y con la industria.</div></div></div>
+      <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:40px;height:40px;border-radius:11px;background:rgba(6,182,212,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px">♾️</div><div><div style="font-weight:700;margin-bottom:3px">Aprendizaje infinito</div><div style="font-size:13px;color:var(--on2)">La IA se actualiza con los últimos avances. Cuando OpenAI lanza algo nuevo, tú lo aprendes la siguiente semana.</div></div></div>
+      <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:40px;height:40px;border-radius:11px;background:rgba(16,185,129,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px">🏆</div><div><div style="font-weight:700;margin-bottom:3px">Progreso gamificado</div><div style="font-size:13px;color:var(--on2)">Gana XP, desbloquea módulos y obtén logros desde principiante hasta arquitecto de Agentes IA.</div></div></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn-p" onclick="cerrarModal('m-tour');abrirModulo(0)" style="padding:9px 22px">¡Comenzar ahora!</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast-el"></div>
+
+<script>
+const API = 'https://app.base44.com/api/agents/69bf571e53cddb8789552b4e';
+const KEY = 'f14d50c117b4427281b91bbb836121c8';
+const CID = '69bf5721ca3719553a969863';
+let busy=false, dPWA=null, modIdx=0, lecIdx=0;
+
+const MODS=[
+  {id:0,title:'Fundamentos de IA',num:'Módulo 01',locked:false,progress:45,color:'#4285F4',bg:'rgba(66,133,244,.1)',desc:'Qué es la IA, historia, tipos y conceptos esenciales.',lecs:['¿Qué es la Inteligencia Artificial?','Historia y evolución de la IA','Tipos: ANI, AGI y ASI','IA vs ML vs Deep Learning'],badge:'activo'},
+  {id:1,title:'Machine Learning',num:'Módulo 02',locked:false,progress:10,color:'#06B6D4',bg:'rgba(6,182,212,.1)',desc:'Algoritmos de aprendizaje automático, datos y predicciones.',lecs:['¿Qué es Machine Learning?','Aprendizaje supervisado','Aprendizaje no supervisado','Evaluación de modelos'],badge:'nuevo'},
+  {id:2,title:'Deep Learning',num:'Módulo 03',locked:true,progress:0,color:'#8B5CF6',bg:'rgba(139,92,246,.1)',desc:'Redes neuronales profundas, CNN y RNN.',lecs:[],badge:'lock'},
+  {id:3,title:'NLP & LLMs',num:'Módulo 04',locked:true,progress:0,color:'#F59E0B',bg:'rgba(245,158,11,.1)',desc:'GPT, Claude, Gemini — cómo funcionan y cómo usarlos.',lecs:[],badge:'lock'},
+  {id:4,title:'Agentes de IA',num:'Módulo 05',locked:true,progress:0,color:'#10B981',bg:'rgba(16,185,129,.1)',desc:'Construye sistemas de agentes autónomos con Loop Engine.',lecs:[],badge:'lock'}
+];
+
+function renderMods(){
+  document.getElementById('mods-grid').innerHTML=MODS.map(m=>`
+    <div class="mod-card${m.locked?' locked':''}" onclick="${m.locked?"toast('🔒 Completa módulos anteriores')":"abrirModulo("+m.id+")"}">
+      ${m.badge==='nuevo'?'<div class="mod-tag tag-new">✨ NUEVO</div>':''}
+      ${m.locked?'<div class="mod-tag tag-lock">🔒 Bloqueado</div>':''}
+      <div class="mod-top">
+        <div class="mod-ico" style="background:${m.bg}"><svg viewBox="0 0 24 24" fill="none" stroke="${m.color}" stroke-width="2"><path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></div>
+        <div class="mod-meta"><div class="mod-num">${m.num}</div><div class="mod-title">${m.title}</div><div class="mod-desc">${m.desc}</div></div>
+      </div>
+      <div class="mod-bot">
+        <span class="mod-cnt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>${m.locked?'Bloqueado':m.lecs.length+' lecciones'}</span>
+        ${!m.locked?`<div class="prog-wrap"><div class="prog-bar"><div class="prog-fill" style="width:${m.progress}%"></div></div><span class="prog-pct">${m.progress}%</span></div>`:''}
+      </div>
+    </div>`).join('');
+}
+
+function abrirModulo(id){
+  const m=MODS[id]; if(m.locked){toast('🔒 Completa módulos anteriores');return;}
+  modIdx=id; lecIdx=0; goPage('lesson');
+  document.getElementById('bc-top').textContent=m.num;
+  document.getElementById('bc-bot').textContent=m.lecs[0]||m.title;
+  cargarLeccion(m,0);
+}
+
+function cargarLeccion(m,li){
+  const lec=m.lecs[li]||m.title;
+  document.getElementById('bc-bot').textContent=lec;
+  document.getElementById('lesson-content').innerHTML=getContenido(m,li);
+  const msgs=document.getElementById('chat-msgs'); msgs.innerHTML='';
+  aiMsg(`¡Hola! 👋 Soy tu Profesor IA para *${lec}*.\n\nEstoy aquí para enseñarte este tema de forma personalizada y adaptativa. Puedes preguntarme lo que quieras — desde lo más básico hasta lo más avanzado.\n\n¿Por dónde quieres empezar?`);
+  document.getElementById('chips').innerHTML=['Explícame desde cero','Dame un ejemplo real','¿Para qué sirve en la práctica?','Quiero ver código','Siguiente lección →'].map(c=>`<button class="chip" onclick="chipEnviar('${c}')">${c}</button>`).join('');
+}
+
+function getContenido(m,li){
+  const lec=m.lecs[li]||m.title;
+  return `<div>
+    <div class="l-tag" style="background:${m.bg};color:${m.color}">${m.num}</div>
+    <h1 class="l-h1">${lec}</h1>
+    <p class="l-intro">Tu Profesor IA está listo para enseñarte este tema. Lee el contenido introductorio y usa el chat para profundizar, preguntar o pedir más ejemplos — el aprendizaje es infinito.</p>
+    <div class="concept"><h4>💡 Concepto clave</h4><p>Cada lección puede expandirse infinitamente según tu nivel. El Profesor IA genera contenido actualizado con los últimos avances de 2026.</p></div>
+    <div class="concept" style="border-left-color:${m.color}"><h4>🎯 Objetivo de esta lección</h4><p>Al finalizar entenderás "${lec}" con total claridad y podrás aplicar este conocimiento en proyectos reales.</p></div>
+    ${li===0&&m.id===0?`<div class="code-box"><pre><span class="cm"># IA detectando spam — ejemplo simple</span>
+<span class="kw">def</span> <span class="fn">es_spam</span>(msg):
+    palabras = [<span class="str">'gratis'</span>, <span class="str">'oferta'</span>, <span class="str">'ganar dinero'</span>]
+    <span class="kw">return</span> any(p <span class="kw">in</span> msg.lower() <span class="kw">for</span> p <span class="kw">in</span> palabras)
+
+<span class="fn">print</span>(es_spam(<span class="str">"Gana dinero gratis hoy"</span>))  <span class="cm"># True</span>
+<span class="cm"># Esto es IA determinista en su forma más simple</span></pre></div>`:''}
+    <div class="quiz"><h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${m.color}" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Mini Quiz</h4>
+      <div style="font-size:13px;font-weight:600;margin-bottom:10px">¿Cuál es el objetivo principal de la Inteligencia Artificial?</div>
+      <div class="q-opt" onclick="checkQ(this,false)"><input type="radio" name="q"> Crear robots físicos idénticos a humanos</div>
+      <div class="q-opt" onclick="checkQ(this,true)"><input type="radio" name="q"> Crear sistemas que aprenden y resuelven problemas</div>
+      <div class="q-opt" onclick="checkQ(this,false)"><input type="radio" name="q"> Solo reconocimiento facial y de voz</div>
+    </div>
+    <div class="l-nav">
+      ${li>0?'<button class="btn-o" onclick="prevLec()" style="padding:9px 18px">← Anterior</button>':''}
+      <button class="btn-p" onclick="nextLec()" style="padding:9px 22px">Siguiente lección <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></button>
+    </div>
+  </div>`;
+}
+
+function nextLec(){
+  const m=MODS[modIdx];
+  if(lecIdx<m.lecs.length-1){lecIdx++;cargarLeccion(m,lecIdx);document.getElementById('lesson-content').scrollTop=0;toast('✅ +50 XP — Lección completada');}
+  else{chipEnviar('Genera una lección avanzada sobre '+m.title+' que vaya más allá del temario base y use ejemplos del mundo real del 2026');toast('🤖 Generando nueva lección con IA...');}
+}
+function prevLec(){if(lecIdx>0){lecIdx--;cargarLeccion(MODS[modIdx],lecIdx);}}
+function checkQ(el,ok){document.querySelectorAll('.q-opt').forEach(o=>o.classList.remove('ok','no'));el.classList.add(ok?'ok':'no');ok?toast('✅ ¡Correcto! +20 XP'):aiMsg('No exactamente. 💭 La respuesta correcta es *"Crear sistemas que aprenden y resuelven problemas"*. ¿Quieres que profundice en esto?');}
+
+async function enviarChat(){
+  if(busy)return;
+  const inp=document.getElementById('chat-inp'),txt=inp.value.trim();
+  if(!txt)return; busy=true; inp.value=''; inp.style.height='auto';
+  usrMsg(txt);
+  const m=MODS[modIdx];
+  const ctx=`[Contexto: Plataforma NeuroLearn AI. Módulo: ${m.title}. Lección: ${m.lecs[lecIdx]||m.title}. Actúa como Profesor experto en IA — didáctico, progresivo, entusiasta. Estudiante en Nivel 3. Responde en español, sé conciso pero completo, usa emojis con moderación. Siempre invita a seguir aprendiendo.]\n\nPregunta del estudiante: ${txt}`;
+  addTyping();
+  try{
+    const r=await fetch(`${API}/conversations/${CID}/messages`,{method:'POST',headers:{'api_key':KEY,'Content-Type':'application/json'},body:JSON.stringify({role:'user',content:ctx})});
+    removeTyping();
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const d=await r.json();
+    let rep=d?.content||d?.message||d?.response||'';
+    if(!rep&&Array.isArray(d))rep=d[d.length-1]?.content||'';
+    if(!rep)rep='Interesante pregunta. 🤔 Puedes ser más específico para que pueda ayudarte mejor.';
+    aiMsg(rep);
+  }catch(e){removeTyping();aiMsg('Hubo un problema de conexión. Intenta de nuevo — estoy aquí para ti. 🔄');}
+  busy=false;
+}
+
+function chipEnviar(t){document.getElementById('chat-inp').value=t;enviarChat();}
+
+function aiMsg(txt){
+  const c=document.getElementById('chat-msgs'),d=document.createElement('div');
+  d.className='msg ai'; d.innerHTML=`<div class="bubble">${txt.replace(/\*([^*]+)\*/g,'<b>$1</b>').replace(/\n/g,'<br>')}</div><div class="msg-t">${ahora()}</div>`;
+  c.appendChild(d); c.scrollTop=c.scrollHeight;
+}
+function usrMsg(txt){
+  const c=document.getElementById('chat-msgs'),d=document.createElement('div');
+  d.className='msg usr'; d.innerHTML=`<div class="bubble">${txt}</div><div class="msg-t">${ahora()}</div>`;
+  c.appendChild(d); c.scrollTop=c.scrollHeight;
+}
+function addTyping(){
+  const c=document.getElementById('chat-msgs'),d=document.createElement('div');
+  d.className='msg ai'; d.id='typing-el'; d.innerHTML='<div class="typing"><span></span><span></span><span></span></div>';
+  c.appendChild(d); c.scrollTop=c.scrollHeight;
+}
+function removeTyping(){document.getElementById('typing-el')?.remove();}
+
+function goPage(n){
+  document.querySelectorAll('.page, .page-lesson').forEach(p=>p.classList.remove('active'));
+  const pg=document.getElementById('page-'+n); if(pg)pg.classList.add('active');
+  const ts={home:'Inicio',progress:'Mi Progreso',lab:'Laboratorio IA',lesson:'Lección IA'};
+  document.getElementById('ttl').innerHTML=ts[n]||'NeuroLearn';
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const nb=document.getElementById('nb-'+n); if(nb)nb.classList.add('active');
+}
+function activeBN(id){document.querySelectorAll('.bn').forEach(b=>b.classList.remove('active'));document.getElementById(id)?.classList.add('active');}
+function toggleSB(){document.getElementById('sidebar').classList.toggle('collapsed');}
+function abrirDrawer(){document.getElementById('drawer').classList.add('open');document.getElementById('dov').classList.add('open');}
+function cerrarDrawer(){document.getElementById('drawer').classList.remove('open');document.getElementById('dov').classList.remove('open');}
+function abrirModal(id){document.getElementById(id).classList.add('open');}
+function cerrarModal(id){document.getElementById(id).classList.remove('open');}
+function autoGrow(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,90)+'px';}
+function chatKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();enviarChat();}}
+function ahora(){return new Date().toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'});}
+function toast(msg){const el=document.getElementById('toast-el');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3500);}
+
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dPWA=e;document.getElementById('inst-bar').classList.add('show');});
+async function instalarPWA(){if(!dPWA)return;dPWA.prompt();const{outcome}=await dPWA.userChoice;if(outcome==='accepted')toast('✅ NeuroLearn instalada como app');dPWA=null;document.getElementById('inst-bar').classList.remove('show');}
+
+renderMods();
+setTimeout(()=>{const fg=document.getElementById('xp-fg');if(fg)fg.style.strokeDashoffset=210-(210*0.62);},600);
+</script>
+</body>
+</html>
